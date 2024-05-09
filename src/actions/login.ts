@@ -2,7 +2,7 @@
 
 import { signIn } from '@/auth'
 import { getUserByEmail } from '@/data/user'
-import { DEFAULT_LOGIN_REDIRECT } from '@/routes'
+import { DEFAULT_USER_LOGIN_REDIRECT } from '@/routes'
 import { LoginSchema } from '@/schemas'
 import { AuthError } from 'next-auth'
 import * as z from 'zod'
@@ -29,7 +29,7 @@ export default async function login(
     await signIn('credentials', {
       email,
       password,
-      redirectTo: callbackUrl || DEFAULT_LOGIN_REDIRECT,
+      redirectTo: callbackUrl || DEFAULT_USER_LOGIN_REDIRECT,
     })
   } catch (error) {
     if (error instanceof AuthError) {

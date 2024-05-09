@@ -1,10 +1,12 @@
 import authConfig from '@/auth.config'
 import {
-  DEFAULT_LOGIN_REDIRECT,
+  DEFAULT_ADMIN_LOGIN_REDIRECT,
+  DEFAULT_USER_LOGIN_REDIRECT,
   apiAuthPrefix,
   authRoutes,
   publicRoutes,
 } from '@/routes'
+import { UserRole } from '@prisma/client'
 import NextAuth from 'next-auth'
 
 const { auth } = NextAuth(authConfig)
@@ -12,6 +14,7 @@ const { auth } = NextAuth(authConfig)
 export default auth((req) => {
   const { nextUrl } = req
   const isLoggedIn = !!req.auth
+  const isAdmin = req.auth?.user.role === UserRole.ADMIN
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix)
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname)
@@ -21,7 +24,11 @@ export default auth((req) => {
 
   if (isAuthRoute) {
     if (isLoggedIn) {
-      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl))
+      if (isAdmin) {
+        return Response.redirect(new URL(DEFAULT_ADMIN_LOGIN_REDIRECT, nextUrl))
+      }
+
+      return Response.redirect(new URL(DEFAULT_USER_LOGIN_REDIRECT, nextUrl))
     }
 
     return

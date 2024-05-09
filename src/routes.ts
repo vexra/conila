@@ -19,4 +19,9 @@ export const apiAuthPrefix = '/api/auth'
 /**
  * The default redirect path after logging in
  */
-export const DEFAULT_LOGIN_REDIRECT = '/dashboard'
+export const DEFAULT_USER_LOGIN_REDIRECT = '/dashboard'
+
+/**
+ * The default admin redirect path after loggin in
+ */
+export const DEFAULT_ADMIN_LOGIN_REDIRECT = '/admin'
