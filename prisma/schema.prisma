@@ -13,14 +13,15 @@ enum UserRole {
 }
 
 model User {
-  id                    String                 @id @default(cuid())
-  name                  String?
-  email                 String?                @unique
-  emailVerified         DateTime?
-  image                 String?
-  password              String?
-  role                  UserRole               @default(USER)
-  accounts              Account[]
+  id                      String                   @id @default(cuid())
+  name                    String?
+  email                   String?                  @unique
+  emailVerified           DateTime?
+  image                   String?
+  password                String?
+  role                    UserRole                 @default(USER)
+  accounts                Account[]
+  letterSignatureRequests LetterSignatureRequest[]
 }
 
 model Account {
@@ -40,4 +41,38 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+}
+
+enum LetterSignatureRequestStatus {
+  PENDING
+  ACCEPTED
+}
+
+model LetterSignatureRequest {
+  id                      String                       @id @default(cuid())
+  userId                  String
+  subject                 String
+  createdAt               DateTime                     @default(now())
+  status                  LetterSignatureRequestStatus
+  sourceLetterDownloadUrl String
+  sourceLetterPathname    String
+  resultLetterDownloadUrl String?
+  resultLetterPathname    String?
+  signatures              Signature[]
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Signature {
+  id                       String @id @default(cuid())
+  name                     String
+  letterSignatureRequestId String
+
+  letterSignatureRequest LetterSignatureRequest @relation(fields: [letterSignatureRequestId], references: [id], onDelete: Cascade)
+}
+
+model LetterTemplate {
+  id      String @id @default(cuid())
+  subject String
+  url     String
 }

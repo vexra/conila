@@ -42,3 +42,58 @@ export const SettingsSchema = z
     },
     { message: 'Password is required!', path: ['password'] },
   )
+
+export const LetterSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  subject: z.string().min(1, { message: 'Subject is required' }),
+  createdAt: z
+    .string()
+    .transform((birthDate) => new Date(birthDate))
+    .pipe(z.date()),
+  status: z.enum(['PENDING', 'ACCEPTED'], {
+    invalid_type_error: 'Please select a letter status.',
+  }),
+  sourceDocumentUrl: z.string().url(),
+  sourceDocumentDownloadUrl: z.string().url(),
+  resultDocumentUrl: z.string().url(),
+  resultDocumentDownloadUrl: z.string().url(),
+})
+
+export const CreateLetterSchema = LetterSchema.pick({ subject: true })
+export const UpdateLetterSchema = LetterSchema.pick({
+  subject: true,
+  status: true,
+})
+
+const ACCEPTED_FILE_TYPES = [
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.oasis.opendocument.text',
+  'application/x-abiword',
+]
+const MAX_IMAGE_SIZE = 5 //In MegaBytes
+
+const sizeInMB = (sizeInBytes: number, decimalsNum = 2) => {
+  const result = sizeInBytes / (1024 * 1024)
+  return +result.toFixed(decimalsNum)
+}
+
+export const CreateLetterSignatureRequestSchema = z.object({
+  subject: z.string().min(1, { message: 'Subject is required!' }),
+  file: z
+    .custom<FileList>()
+    .refine((files) => {
+      return Array.from(files ?? []).length !== 0
+    }, 'File is required')
+    .refine((files) => {
+      return Array.from(files ?? []).every(
+        (file) => sizeInMB(file.size) <= MAX_IMAGE_SIZE,
+      )
+    }, `The maximum image size is ${MAX_IMAGE_SIZE}MB`)
+    .refine((files) => {
+      return Array.from(files ?? []).every((file) =>
+        ACCEPTED_FILE_TYPES.includes(file.type),
+      )
+    }, 'File type is not supported'),
+})
