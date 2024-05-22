@@ -24,37 +24,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { getLetterSignatureRequestsByUserId } from '@/data/letter-signature-request'
-import { currentUser } from '@/lib/auth'
-import { MoreHorizontal, PlusCircle } from 'lucide-react'
+import { getLetterSignatureRequests } from '@/data/letter-signature-request'
+import { MoreHorizontal } from 'lucide-react'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 
 export default async function Page() {
-  const user = await currentUser()
-  if (!user) return redirect('/auth/login')
-
-  const letterSignatureRequests = await getLetterSignatureRequestsByUserId(
-    user.id as string,
-  )
+  const letterSignatureRequests = await getLetterSignatureRequests()
 
   return (
     <div className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-      <div className="flex items-center justify-end">
-        <Link href="/dashboard/letters/create">
-          <Button size="sm" className="h-8 gap-1">
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Minta tanda tangan
-            </span>
-          </Button>
-        </Link>
-      </div>
-
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader>
           <CardTitle>Surat</CardTitle>
-          <CardDescription>Kelola surat kamu</CardDescription>
+          <CardDescription>Kelola surat pengguna</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -64,6 +46,7 @@ export default async function Page() {
                 <TableHead>Status</TableHead>
                 <TableHead>Dokumen Sumber</TableHead>
                 <TableHead>Dokumen Hasil</TableHead>
+                <TableHead>Penanda Tangan</TableHead>
                 <TableHead className="hidden md:table-cell">
                   Tanggal Dibuat
                 </TableHead>
@@ -98,6 +81,11 @@ export default async function Page() {
                         />
                       )}
                   </TableCell>
+                  <TableCell>
+                    {letterSignatureRequest.signatures.map((signature) => (
+                      <p key={signature.id}>{signature.staff.name}</p>
+                    ))}
+                  </TableCell>
                   <TableCell className="hidden md:table-cell">
                     {letterSignatureRequest.createdAt.toLocaleString()}
                   </TableCell>
@@ -115,6 +103,18 @@ export default async function Page() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <Link
+                          href={`/admin/letters/${letterSignatureRequest.id}/manage-signature`}
+                        >
+                          <DropdownMenuItem>
+                            Kelola tanda tangan
+                          </DropdownMenuItem>
+                        </Link>
+                        <Link
+                          href={`/admin/letters/${letterSignatureRequest.id}/edit`}
+                        >
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                        </Link>
                         <DropdownMenuItem>
                           <DeleteLetterSignatureRequest
                             id={letterSignatureRequest.id}

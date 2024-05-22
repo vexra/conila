@@ -1,6 +1,6 @@
 'use client'
 
-import { createLetterSignatureRequest } from '@/actions/letter-signature-request'
+import { createSignature } from '@/actions/signature'
 import FormError from '@/components/form-error'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,7 +18,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -26,41 +25,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { CreateLetterSignatureRequestSchema } from '@/schemas'
+import { CreateSignatureSchema } from '@/schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { LetterTemplate } from '@prisma/client'
+import { Staff } from '@prisma/client'
 import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-type CreateLetterSignatureRequestFormTypes = {
-  letterTemplates: LetterTemplate[]
+type Props = {
+  letterSignatureRequestId: string
+  staff: Staff[]
 }
 
-export default function CreateLetterSignatureRequestForm({
-  letterTemplates,
-}: CreateLetterSignatureRequestFormTypes) {
+export default function CreateSignatureForm({
+  letterSignatureRequestId,
+  staff,
+}: Props) {
   const [error, setError] = useState<string | undefined>('')
   const [isPending, startTransition] = useTransition()
 
-  const form = useForm<z.infer<typeof CreateLetterSignatureRequestSchema>>({
-    resolver: zodResolver(CreateLetterSignatureRequestSchema),
-    defaultValues: {
-      subject: '',
-    },
+  const form = useForm<z.infer<typeof CreateSignatureSchema>>({
+    resolver: zodResolver(CreateSignatureSchema),
   })
 
-  function onSubmit(
-    values: z.infer<typeof CreateLetterSignatureRequestSchema>,
-  ) {
+  function onSubmit(values: z.infer<typeof CreateSignatureSchema>) {
     setError('')
 
-    const formData = new FormData()
-    formData.append('subject', values.subject)
-    formData.append('file', values.file[0])
-
     startTransition(() => {
-      createLetterSignatureRequest(formData)
+      createSignature(letterSignatureRequestId, values)
         .then((data) => {
           if (data?.error) {
             form.reset()
@@ -71,13 +63,13 @@ export default function CreateLetterSignatureRequestForm({
     })
   }
 
-  const fileRef = form.register('file')
-
   return (
     <Card className="w-[400px] shadow-md">
       <CardHeader>
-        <CardTitle>Minta tanda tangan</CardTitle>
-        <CardDescription>Isi detail untuk membuat tanda tangan</CardDescription>
+        <CardTitle>Tambah Penanda Tangan</CardTitle>
+        <CardDescription>
+          Isi detail untuk menambah penanda tangan baru
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -85,7 +77,7 @@ export default function CreateLetterSignatureRequestForm({
             <div className="space-y-4">
               <FormField
                 control={form.control}
-                name="subject"
+                name="staffId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Subject</FormLabel>
@@ -95,16 +87,16 @@ export default function CreateLetterSignatureRequestForm({
                     >
                       <FormControl>
                         <SelectTrigger disabled={isPending}>
-                          <SelectValue placeholder="Pilih subjek" />
+                          <SelectValue placeholder="Pilih staff" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {letterTemplates.map((letterTemplate) => (
+                        {staff.map((staffMember) => (
                           <SelectItem
-                            key={letterTemplate.id}
-                            value={letterTemplate.title}
+                            key={staffMember.id}
+                            value={staffMember.id}
                           >
-                            {letterTemplate.title}
+                            {staffMember.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -112,27 +104,6 @@ export default function CreateLetterSignatureRequestForm({
                     <FormMessage />
                   </FormItem>
                 )}
-              />
-
-              <FormField
-                control={form.control}
-                name="file"
-                render={({ field }) => {
-                  return (
-                    <FormItem>
-                      <FormLabel>File</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={isPending}
-                          type="file"
-                          placeholder="letter"
-                          {...fileRef}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )
-                }}
               />
             </div>
 

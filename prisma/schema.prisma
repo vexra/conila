@@ -65,14 +65,23 @@ model LetterSignatureRequest {
 
 model Signature {
   id                       String @id @default(cuid())
-  name                     String
+  staffId                  String
   letterSignatureRequestId String
 
+  staff                  Staff                  @relation(fields: [staffId], references: [id], onDelete: Cascade)
   letterSignatureRequest LetterSignatureRequest @relation(fields: [letterSignatureRequestId], references: [id], onDelete: Cascade)
 }
 
+model Staff {
+  id         String      @id @default(cuid())
+  name       String
+  position   String
+  signatures Signature[]
+}
+
 model LetterTemplate {
-  id      String @id @default(cuid())
-  subject String
-  url     String
+  id          String @id @default(cuid())
+  title       String
+  pathname    String
+  downloadUrl String
 }

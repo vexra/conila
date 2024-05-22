@@ -72,7 +72,7 @@ const ACCEPTED_FILE_TYPES = [
   'application/vnd.oasis.opendocument.text',
   'application/x-abiword',
 ]
-const MAX_IMAGE_SIZE = 5 //In MegaBytes
+const MAX_FILE_SIZE = 5 //In MegaBytes
 
 const sizeInMB = (sizeInBytes: number, decimalsNum = 2) => {
   const result = sizeInBytes / (1024 * 1024)
@@ -88,12 +88,70 @@ export const CreateLetterSignatureRequestSchema = z.object({
     }, 'File is required')
     .refine((files) => {
       return Array.from(files ?? []).every(
-        (file) => sizeInMB(file.size) <= MAX_IMAGE_SIZE,
+        (file) => sizeInMB(file.size) <= MAX_FILE_SIZE,
       )
-    }, `The maximum image size is ${MAX_IMAGE_SIZE}MB`)
+    }, `The maximum file size is ${MAX_FILE_SIZE}MB`)
     .refine((files) => {
       return Array.from(files ?? []).every((file) =>
         ACCEPTED_FILE_TYPES.includes(file.type),
       )
     }, 'File type is not supported'),
 })
+
+export const UploadAcceptedLetterSchema = z.object({
+  file: z
+    .custom<FileList>()
+    .refine((files) => {
+      return Array.from(files ?? []).length !== 0
+    }, 'File is required')
+    .refine((files) => {
+      return Array.from(files ?? []).every(
+        (file) => sizeInMB(file.size) <= MAX_FILE_SIZE,
+      )
+    }, `The maximum file size is ${MAX_FILE_SIZE}MB`)
+    .refine((files) => {
+      return Array.from(files ?? []).every((file) =>
+        ACCEPTED_FILE_TYPES.includes(file.type),
+      )
+    }, 'File type is not supported'),
+})
+
+export const StaffSchema = z.object({
+  name: z.string().min(1, { message: 'Name is required' }),
+  position: z.string().min(1, { message: 'Position is required' }),
+})
+
+export const CreateStaffSchema = StaffSchema
+export const UpdateStaffSchema = StaffSchema
+
+export const CreateLetterTemplateSchema = z.object({
+  title: z.string().min(1, { message: 'Title is required!' }),
+  file: z
+    .custom<FileList>()
+    .refine((files) => {
+      return Array.from(files ?? []).length !== 0
+    }, 'File is required')
+    .refine((files) => {
+      return Array.from(files ?? []).every(
+        (file) => sizeInMB(file.size) <= MAX_FILE_SIZE,
+      )
+    }, `The maximum file size is ${MAX_FILE_SIZE}MB`)
+    .refine((files) => {
+      return Array.from(files ?? []).every((file) =>
+        ACCEPTED_FILE_TYPES.includes(file.type),
+      )
+    }, 'File type is not supported'),
+})
+
+export const UpdateLetterTemplateSchema = z.object({
+  title: z.string().min(1, { message: 'Title is required!' }),
+})
+
+export const SignatureSchema = z.object({
+  staffId: z.string().min(1, { message: 'StaffId is required' }),
+  letterSignatureRequestId: z
+    .string()
+    .min(1, { message: 'LetterSignatureRequestId is required' }),
+})
+
+export const CreateSignatureSchema = SignatureSchema.pick({ staffId: true })

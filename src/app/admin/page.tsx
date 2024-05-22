@@ -8,18 +8,14 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import {
-  getLetterAcceptedCountByUserId,
-  getLetterPendingCountByUserId,
+  getLetterAcceptedCounts,
+  getLetterPendingCounts,
 } from '@/data/letter-signature-request'
-import { currentUser } from '@/lib/auth'
 import Link from 'next/link'
 
 export default async function Page() {
-  const user = await currentUser()
-  if (!user || !user.id) return <></>
-
-  const letterPendingCount = await getLetterPendingCountByUserId(user.id)
-  const letterAcceptedCount = await getLetterAcceptedCountByUserId(user.id)
+  const letterPendingCount = await getLetterPendingCounts()
+  const letterAcceptedCount = await getLetterAcceptedCounts()
 
   return (
     <div className="p-4 sm:px-6 sm:py-0">
@@ -34,7 +30,9 @@ export default async function Page() {
           </CardHeader>
           <CardFooter>
             <Button>
-              <Link href="/dashboard/letters/create">Minta tanda tangan</Link>
+              <Link href="/admin/letter-templates/create">
+                Upload template surat
+              </Link>
             </Button>
           </CardFooter>
         </Card>

@@ -15,7 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { FileDown, Home, Mail, PanelLeft, User } from 'lucide-react'
+import { File, Home, Mail, PanelLeft, User, Users } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -29,7 +29,7 @@ export default function Layout({
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-zinc-100 sm:flex">
         <nav className="flex flex-col items-center gap-4 px-2 sm:py-4">
           <Link
-            href="/dashboard"
+            href="/admin"
             className="flex items-center justify-center rounded-full"
           >
             <Image
@@ -44,23 +44,36 @@ export default function Layout({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  href="/dashboard"
+                  href="/admin"
                   className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8"
                 >
                   <Home className="h-5 w-5" />
-                  <span className="sr-only">Dashboard</span>
+                  <span className="sr-only">Admin Dashboard</span>
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right">Dashboard</TooltipContent>
+              <TooltipContent side="right">Admin Dashboard</TooltipContent>
             </Tooltip>
 
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  href="/dashboard/templates"
+                  href="/admin/staff"
                   className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8"
                 >
-                  <FileDown className="h-5 w-5" />
+                  <Users className="h-5 w-5" />
+                  <span className="sr-only">Staff</span>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right">Staff</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href="/admin/letter-templates"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8"
+                >
+                  <File className="h-5 w-5" />
                   <span className="sr-only">Template Surat</span>
                 </Link>
               </TooltipTrigger>
@@ -70,7 +83,7 @@ export default function Layout({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  href="/dashboard/letters"
+                  href="/admin/letters"
                   className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8"
                 >
                   <Mail className="h-5 w-5" />
@@ -94,7 +107,7 @@ export default function Layout({
             <SheetContent side="left" className="sm:max-w-xs">
               <nav className="grid gap-6 text-lg font-medium">
                 <Link
-                  href="#"
+                  href="/admin"
                   className="justify-cente flex h-10 w-10 shrink-0 items-center rounded-full"
                 >
                   <Image
@@ -107,17 +120,24 @@ export default function Layout({
                 </Link>
                 <Link href="/" className="flex items-center gap-4 px-2.5">
                   <Home className="h-5 w-5" />
-                  Dashboard
+                  Admin
                 </Link>
                 <Link
-                  href="/dashboard/templates"
+                  href="/admin/staff"
                   className="flex items-center gap-4 px-2.5"
                 >
-                  <FileDown className="h-5 w-5" />
+                  <Users className="h-5 w-5" />
+                  Staff
+                </Link>
+                <Link
+                  href="/admin/letter-templates"
+                  className="flex items-center gap-4 px-2.5"
+                >
+                  <File className="h-5 w-5" />
                   Template Surat
                 </Link>
                 <Link
-                  href="/dashboard/letters"
+                  href="/admin/letters"
                   className="flex items-center gap-4 px-2.5"
                 >
                   <Mail className="h-5 w-5" />

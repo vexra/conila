@@ -1,6 +1,6 @@
 'use client'
 
-import { createLetterSignatureRequest } from '@/actions/letter-signature-request'
+import { createLetterTemplate } from '@/actions/letter-template'
 import FormError from '@/components/form-error'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,48 +19,32 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { CreateLetterSignatureRequestSchema } from '@/schemas'
+import { CreateLetterTemplateSchema } from '@/schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { LetterTemplate } from '@prisma/client'
 import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-type CreateLetterSignatureRequestFormTypes = {
-  letterTemplates: LetterTemplate[]
-}
-
-export default function CreateLetterSignatureRequestForm({
-  letterTemplates,
-}: CreateLetterSignatureRequestFormTypes) {
+export default function CreateLetterTemplateForm() {
   const [error, setError] = useState<string | undefined>('')
   const [isPending, startTransition] = useTransition()
 
-  const form = useForm<z.infer<typeof CreateLetterSignatureRequestSchema>>({
-    resolver: zodResolver(CreateLetterSignatureRequestSchema),
+  const form = useForm<z.infer<typeof CreateLetterTemplateSchema>>({
+    resolver: zodResolver(CreateLetterTemplateSchema),
     defaultValues: {
-      subject: '',
+      title: '',
     },
   })
 
-  function onSubmit(
-    values: z.infer<typeof CreateLetterSignatureRequestSchema>,
-  ) {
+  function onSubmit(values: z.infer<typeof CreateLetterTemplateSchema>) {
     setError('')
 
     const formData = new FormData()
-    formData.append('subject', values.subject)
+    formData.append('title', values.title)
     formData.append('file', values.file[0])
 
     startTransition(() => {
-      createLetterSignatureRequest(formData)
+      createLetterTemplate(formData)
         .then((data) => {
           if (data?.error) {
             form.reset()
@@ -76,8 +60,10 @@ export default function CreateLetterSignatureRequestForm({
   return (
     <Card className="w-[400px] shadow-md">
       <CardHeader>
-        <CardTitle>Minta tanda tangan</CardTitle>
-        <CardDescription>Isi detail untuk membuat tanda tangan</CardDescription>
+        <CardTitle>Tambah template surat</CardTitle>
+        <CardDescription>
+          Isi detail untuk menambah template surat
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -85,30 +71,18 @@ export default function CreateLetterSignatureRequestForm({
             <div className="space-y-4">
               <FormField
                 control={form.control}
-                name="subject"
+                name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Subject</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger disabled={isPending}>
-                          <SelectValue placeholder="Pilih subjek" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {letterTemplates.map((letterTemplate) => (
-                          <SelectItem
-                            key={letterTemplate.id}
-                            value={letterTemplate.title}
-                          >
-                            {letterTemplate.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Judul</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        disabled={isPending}
+                        placeholder="Judul surat"
+                        type="text"
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

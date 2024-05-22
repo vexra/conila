@@ -1,6 +1,5 @@
 import { DownloadButton } from '@/components/download-button'
-import { DeleteLetterSignatureRequest } from '@/components/letter/buttons'
-import { Badge } from '@/components/ui/badge'
+import { DeleteLetterTemplate } from '@/components/letter-templates/buttons'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -24,28 +23,21 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { getLetterSignatureRequestsByUserId } from '@/data/letter-signature-request'
-import { currentUser } from '@/lib/auth'
+import { getLetterTemplates } from '@/data/letter-template'
 import { MoreHorizontal, PlusCircle } from 'lucide-react'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 
 export default async function Page() {
-  const user = await currentUser()
-  if (!user) return redirect('/auth/login')
-
-  const letterSignatureRequests = await getLetterSignatureRequestsByUserId(
-    user.id as string,
-  )
+  const letterTemplates = await getLetterTemplates()
 
   return (
     <div className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
       <div className="flex items-center justify-end">
-        <Link href="/dashboard/letters/create">
+        <Link href="/admin/letter-templates/create">
           <Button size="sm" className="h-8 gap-1">
             <PlusCircle className="h-3.5 w-3.5" />
             <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Minta tanda tangan
+              Tambah template
             </span>
           </Button>
         </Link>
@@ -53,53 +45,28 @@ export default async function Page() {
 
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader>
-          <CardTitle>Surat</CardTitle>
-          <CardDescription>Kelola surat kamu</CardDescription>
+          <CardTitle>Template Surat</CardTitle>
+          <CardDescription>Kelola template surat</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Subjek</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Dokumen Sumber</TableHead>
-                <TableHead>Dokumen Hasil</TableHead>
-                <TableHead className="hidden md:table-cell">
-                  Tanggal Dibuat
-                </TableHead>
-                <TableHead>
-                  <span className="sr-only">Actions</span>
-                </TableHead>
+                <TableHead>Judul</TableHead>
+                <TableHead>File</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {letterSignatureRequests?.map((letterSignatureRequest) => (
-                <TableRow key={letterSignatureRequest.id}>
+              {letterTemplates?.map((letterTemplate) => (
+                <TableRow key={letterTemplate.id}>
                   <TableCell className="font-medium">
-                    {letterSignatureRequest.subject}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {letterSignatureRequest.status}
-                    </Badge>
+                    {letterTemplate.title}
                   </TableCell>
                   <TableCell>
                     <DownloadButton
-                      url={letterSignatureRequest.sourceLetterDownloadUrl}
-                      pathname={letterSignatureRequest.sourceLetterPathname}
+                      url={letterTemplate.downloadUrl}
+                      pathname={letterTemplate.pathname}
                     />
-                  </TableCell>
-                  <TableCell>
-                    {letterSignatureRequest.resultLetterDownloadUrl &&
-                      letterSignatureRequest.resultLetterPathname && (
-                        <DownloadButton
-                          url={letterSignatureRequest.resultLetterDownloadUrl}
-                          pathname={letterSignatureRequest.resultLetterPathname}
-                        />
-                      )}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    {letterSignatureRequest.createdAt.toLocaleString()}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
@@ -115,10 +82,13 @@ export default async function Page() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <Link
+                          href={`/admin/letter-templates/${letterTemplate.id}/edit`}
+                        >
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                        </Link>
                         <DropdownMenuItem>
-                          <DeleteLetterSignatureRequest
-                            id={letterSignatureRequest.id}
-                          />
+                          <DeleteLetterTemplate id={letterTemplate.id} />
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
