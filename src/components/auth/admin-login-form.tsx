@@ -1,6 +1,6 @@
 'use client'
 
-import { login } from '@/actions/login'
+import { adminLogin } from '@/actions/login'
 import FormError from '@/components/form-error'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,7 +19,7 @@ import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-export default function LoginForm() {
+export default function AdminLoginForm() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl')
   const urlError =
@@ -42,7 +42,7 @@ export default function LoginForm() {
     setError('')
 
     startTransition(() => {
-      login(values, callbackUrl)
+      adminLogin(values, callbackUrl)
         .then((data) => {
           if (data?.error) {
             form.reset()
