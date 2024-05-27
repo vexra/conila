@@ -2,7 +2,10 @@ import db from '@/lib/db'
 
 export async function getSignatureById(id: string) {
   try {
-    const signature = await db.signature.findUnique({ where: { id } })
+    const signature = await db.signature.findUnique({
+      where: { id },
+      include: { staff: true, letterSignatureRequest: true },
+    })
 
     return signature
   } catch {
