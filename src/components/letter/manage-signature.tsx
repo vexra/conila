@@ -1,4 +1,7 @@
-import { DeleteSignature } from '@/components/signature/buttons'
+import {
+  DeleteSignature,
+  DownloadSignatureQRCode,
+} from '@/components/signature/buttons'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -89,6 +92,9 @@ export default function ManageSignature({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem>
+                          <DownloadSignatureQRCode id={signature.id} />
+                        </DropdownMenuItem>
                         <DropdownMenuItem>
                           <DeleteSignature
                             letterSignatureRequestId={
