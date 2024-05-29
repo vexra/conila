@@ -7,7 +7,7 @@ export function DeleteAcceptedLetterForm({ id }: { id: string }) {
 
   return (
     <form action={deleteAcceptedLetterWithId}>
-      <button type="submit">Delete Surat Hasil</button>
+      <button type="submit">Hapus Surat Hasil</button>
     </form>
   )
 }

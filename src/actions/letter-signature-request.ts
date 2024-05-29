@@ -97,7 +97,7 @@ export async function deleteAcceptedLetterById(id: string) {
       },
     })
 
-    redirect(`/admin/letters/${id}/edit`)
+    return revalidatePath('/admin/letters')
   } catch (error) {
     return {
       error: 'Database Error: Failed to Delete Accepted Letter!',
@@ -106,36 +106,30 @@ export async function deleteAcceptedLetterById(id: string) {
 }
 
 export async function uploadAcceptedLetter(id: string, formData: FormData) {
-  try {
-    const file = formData.get('file') as File
+  const file = formData.get('file') as File
 
-    const validatedFields = UploadAcceptedLetterSchema.safeParse({
-      file: [file],
-    })
+  const validatedFields = UploadAcceptedLetterSchema.safeParse({
+    file: [file],
+  })
 
-    if (!validatedFields.success) {
-      return { error: 'Invalid fields!' }
-    }
-
-    const { file: validatedFile } = validatedFields.data
-
-    const blob = await put(validatedFile[0].name, validatedFile[0], {
-      access: 'public',
-    })
-
-    const letterSignatureRequest = await db.letterSignatureRequest.update({
-      where: { id },
-      data: {
-        status: LetterSignatureRequestStatus.ACCEPTED,
-        resultLetterDownloadUrl: blob.downloadUrl,
-        resultLetterPathname: blob.pathname,
-      },
-    })
-
-    return redirect(`/admin/letters/${id}/edit`)
-  } catch (error) {
-    return {
-      error: 'Database Error: Failed to Uplaod Accepted Letter!',
-    }
+  if (!validatedFields.success) {
+    return { error: 'Invalid fields!' }
   }
+
+  const { file: validatedFile } = validatedFields.data
+
+  const blob = await put(validatedFile[0].name, validatedFile[0], {
+    access: 'public',
+  })
+
+  const letterSignatureRequest = await db.letterSignatureRequest.update({
+    where: { id },
+    data: {
+      status: LetterSignatureRequestStatus.ACCEPTED,
+      resultLetterDownloadUrl: blob.downloadUrl,
+      resultLetterPathname: blob.pathname,
+    },
+  })
+
+  return redirect('/admin/letters')
 }

@@ -1,5 +1,6 @@
 import { DownloadButton } from '@/components/download-button'
 import { DeleteLetterSignatureRequest } from '@/components/letter/buttons'
+import { DeleteAcceptedLetterForm } from '@/components/letter/delete-accepted-letter-form'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -110,11 +111,24 @@ export default async function Page() {
                             Kelola tanda tangan
                           </DropdownMenuItem>
                         </Link>
-                        <Link
-                          href={`/admin/letters/${letterSignatureRequest.id}/edit`}
-                        >
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-                        </Link>
+
+                        {letterSignatureRequest.resultLetterDownloadUrl && (
+                          <DropdownMenuItem>
+                            <DeleteAcceptedLetterForm
+                              id={letterSignatureRequest.id}
+                            />
+                          </DropdownMenuItem>
+                        )}
+
+                        {!letterSignatureRequest.resultLetterDownloadUrl && (
+                          <Link
+                            href={`/admin/letters/${letterSignatureRequest.id}/edit`}
+                          >
+                            <DropdownMenuItem>
+                              Upload surat hasil
+                            </DropdownMenuItem>
+                          </Link>
+                        )}
                         <DropdownMenuItem>
                           <DeleteLetterSignatureRequest
                             id={letterSignatureRequest.id}
